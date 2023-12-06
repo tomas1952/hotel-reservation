@@ -103,7 +103,7 @@ fun main(args: Array<String>) {
                 val reservations = reservationService.getAllReservations()
             }
             4 -> {
-                println("시스템을 종료 합니다.")
+                println("시스템을 종료 합니다.asfdasfsa")
                 break;
             }
             else -> {
