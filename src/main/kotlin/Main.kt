@@ -73,6 +73,9 @@ fun inputRoomReservation(): Reservation {
         }
     }
 
+    println()
+    println()
+
     return Reservation(
         name = name,
         roomNumber = roomNumber,
@@ -96,21 +99,23 @@ fun printRoomReservation(reservations: ArrayList<Reservation>) {
         val strCheckOut = localDateToString(r.checkOutDate)
 
         val content = String.format("\t번호: %d", r.id) +
-                    String.format("\t사용자: %4s", r.name) +
+                    String.format("\t사용자: %5s", r.name) +
                     String.format("\t방번호: %4d호", r.roomNumber) +
                     String.format("\t체크인: %s", strCheckIn) +
                     String.format("\t체크아웃: %s", strCheckOut) +
-                    String.format("\t요금: %d", r.roomFee)
+                    String.format("\t요금: %8d", r.roomFee)
         println(content)
     }
+    println()
+    println()
 }
 
 fun main(args: Array<String>) {
+    println("호텔예약 프로그램 입니다.")
     val reservationService = ReservationService()
 
     var lastedInput = 0
     while(true) {
-        println("호텔예약 프로그램 입니다.")
         println("===============================================[메뉴]===============================================")
         println("1.방예약    2.예약목록 출력    3.예약목록 (정렬) 출력    4.시스템 종료    5.금액 입금-출금 내역 목록 출력    6.예약 변경")
         println("===================================================================================================")
@@ -123,6 +128,10 @@ fun main(args: Array<String>) {
             }
             2 -> {
                 val reservations = reservationService.getAllReservations()
+                printRoomReservation(reservations)
+            }
+            3 -> {
+                val reservations = reservationService.getAllReservations(isSorted = true)
                 printRoomReservation(reservations)
             }
             4 -> {
