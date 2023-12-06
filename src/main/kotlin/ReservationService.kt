@@ -16,8 +16,8 @@ class ReservationService(
     fun validateCheckInDate(roomNumber: Int, date: LocalDate) {
         val filtered = reservations.filter {
             it.roomNumber == roomNumber
-                    && (it.checkInDate.isEqual(date) || it.checkInDate.isAfter(date))
-                    && it.checkOutDate.isBefore(date)
+                    && (it.checkInDate.isEqual(date) || it.checkInDate.isBefore(date))
+                    && date.isBefore(it.checkOutDate)
         }
         if (filtered.isNotEmpty())
             throw DuplicatedResourceException("예약")
@@ -26,8 +26,8 @@ class ReservationService(
     fun validateCheckOutDate(roomNumber: Int, date: LocalDate) {
         val filtered = reservations.filter {
             it.roomNumber == roomNumber
-                    && it.checkInDate.isAfter(date)
-                    && (it.checkOutDate.isEqual(date) || it.checkOutDate.isBefore(date))
+                    && it.checkInDate.isBefore(date)
+                    && (date.isEqual(it.checkOutDate) || date.isBefore(it.checkOutDate))
         }
         if (filtered.isNotEmpty())
             throw DuplicatedResourceException("예약")
@@ -39,8 +39,8 @@ class ReservationService(
 
         val filtered = reservations.filter {
             it.roomNumber == roomNumber
-                    && it.checkInDate.isBefore(checkInDate)
-                    && it.checkOutDate.isAfter(checkOutDate)
+                    && checkInDate.isBefore(it.checkInDate)
+                    && checkOutDate.isAfter(it.checkOutDate)
         }
 
         if (filtered.isNotEmpty())
@@ -63,4 +63,21 @@ class ReservationService(
         }
         return ArrayList(list)
     }
+}
+
+fun main() {
+    val service = ReservationService()
+    service.add(
+        Reservation(
+            name = "aaa",
+            roomNumber = 101,
+            checkInDate = LocalDate.of(2023, 12, 10),
+            checkOutDate = LocalDate.of(2023, 12, 11),
+            roomFee = 10000,
+        )
+    )
+
+    service.validateCheckInOutDate(101, LocalDate.of(2023, 12, 9), LocalDate.of(2023, 12, 12))
+
+    println()
 }

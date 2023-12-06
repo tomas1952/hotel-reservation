@@ -14,16 +14,17 @@ fun inputAvailableMenu(): Int {
         println("입력할 수 있는 명령어는 1,2,3,4,5,6 입니다.")
     }
 }
-fun inputRoomReservation(): Reservation {
+fun inputRoomReservation(reservationService: ReservationService): Reservation {
     var name = ""
     while(true) {
         println("예약자분의 성함을 알려주세요")
         val raw = readln()
         name = raw.trim()
-        if (name.isNotEmpty()){
-            break;
+        if (name.isEmpty() || name.isBlank()) {
+            println("이름은 1자이상 이어야 합니다.")
+            continue
         }
-        println("이름은 1자이상 이어야 합니다.")
+        break;
     }
 
     var roomNumber = 0
@@ -32,45 +33,70 @@ fun inputRoomReservation(): Reservation {
         val raw = readln()
         try {
             roomNumber = raw.trim().toInt()
-            if (roomNumber > 99 && roomNumber < 1000) {
-                break;
-            }
-            println("방번호는 100 ~ 999 사이를 입력해주세요.")
         } catch (e: Exception) {
             println("방번호는 숫자를 입력해주세요!!!")
+            continue
         }
+
+        if (roomNumber < 100 || roomNumber > 999) {
+            println("방번호는 100 ~ 999 사이를 입력해주세요.")
+            continue
+        }
+
+        break;
     }
 
     val now = LocalDate.now()
-    var checkInDate:LocalDate
+    var checkInDate:LocalDate = now
 
     while(true) {
         println("체크인 날짜를 입력해주세요. (e.g.: 20230631)")
         val raw = readln()
         try {
             checkInDate = LocalDate.parse(raw, DateTimeFormatter.ofPattern("yyyyMMdd"))
-            if (checkInDate.isEqual(now) || checkInDate.isAfter(now)) {
-                break;
-            }
-            println("체크인은 지난날을 선택할 수 없습니다.")
         } catch (e: Exception) {
             println("올바른 날짜 형식이 아닙니다.")
+            continue
         }
+
+        if (checkInDate.isBefore(now)) {
+            println("체크인은 지난날을 선택할 수 없습니다.")
+            continue
+        }
+
+        try {
+            reservationService.validateCheckInDate(roomNumber, checkInDate)
+        } catch (e: Exception) {
+            println("해당 날짜는 체크인 할 수 없습니다.")
+            continue
+        }
+
+
+        break;
     }
 
-    var checkOutDate:LocalDate
+    var checkOutDate:LocalDate = now
     while(true) {
         println("체크아웃 날짜를 입력해주세요. (e.g.: 20230631)")
         val raw = readln()
         try {
             checkOutDate = LocalDate.parse(raw, DateTimeFormatter.ofPattern("yyyyMMdd"))
-            if (checkOutDate.isAfter(checkInDate)) {
-                break;
-            }
-            println("체크인 날짜보다 이전이거나 같을 수는 없습니다.")
         } catch (e: Exception) {
             println("올바른 날짜 형식이 아닙니다.")
         }
+
+        if (checkOutDate.isEqual(checkInDate) || checkOutDate.isBefore(checkInDate)) {
+            println("체크인 날짜보다 이전이거나 같을 수는 없습니다.")
+            continue
+        }
+
+        try {
+            reservationService.validateCheckInOutDate(roomNumber, checkInDate, checkOutDate)
+        } catch (e: Exception) {
+            println("해당 날짜는 체크아웃 할 수 없습니다.")
+            continue
+        }
+        break;
     }
 
     println()
@@ -123,7 +149,7 @@ fun main(args: Array<String>) {
         val command = inputAvailableMenu()
         when(command) {
             1 -> {
-                val reservation = inputRoomReservation()
+                val reservation = inputRoomReservation(reservationService)
                 reservationService.add(reservation)
             }
             2 -> {
