@@ -1,6 +1,6 @@
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Random
+import kotlin.random.Random
 
 fun inputAvailableMenu(): Int {
     var curInput = "0"
@@ -20,7 +20,6 @@ fun inputRoomReservation(): Reservation {
         println("예약자분의 성함을 알려주세요")
         val raw = readln()
         name = raw.trim()
-        println(name)
         if (name.isNotEmpty()){
             break;
         }
@@ -79,8 +78,31 @@ fun inputRoomReservation(): Reservation {
         roomNumber = roomNumber,
         checkInDate = checkInDate,
         checkOutDate = checkOutDate,
-        roomFee = Random().nextInt(50000, 50000)
+        roomFee = Random.nextInt(5000, 10000) * 10
     )
+}
+
+fun localDateToString(a: LocalDate): String {
+    val strYear = a.year.toString()
+    val strMonth = a.monthValue.toString().padStart(2, '0')
+    val strDay = a.dayOfMonth.toString().padStart(2, '0')
+
+    return "${strYear}-${strMonth}-${strDay}"
+}
+
+fun printRoomReservation(reservations: ArrayList<Reservation>) {
+    for (r in reservations) {
+        val strCheckIn = localDateToString(r.checkInDate)
+        val strCheckOut = localDateToString(r.checkOutDate)
+
+        val content = String.format("\t번호: %d", r.id) +
+                    String.format("\t사용자: %4s", r.name) +
+                    String.format("\t방번호: %4d호", r.roomNumber) +
+                    String.format("\t체크인: %s", strCheckIn) +
+                    String.format("\t체크아웃: %s", strCheckOut) +
+                    String.format("\t요금: %d", r.roomFee)
+        println(content)
+    }
 }
 
 fun main(args: Array<String>) {
@@ -101,9 +123,10 @@ fun main(args: Array<String>) {
             }
             2 -> {
                 val reservations = reservationService.getAllReservations()
+                printRoomReservation(reservations)
             }
             4 -> {
-                println("시스템을 종료 합니다.asfdasfsa")
+                println("시스템을 종료 합니다.")
                 break;
             }
             else -> {
