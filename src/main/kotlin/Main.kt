@@ -1,20 +1,12 @@
 import controller.MainMenuControllerImpl
-import controller.ReservationController
 import controller.ReservationControllerImpl
 import enumeration.MainMenuType.*
-import java.time.LocalDate
-fun localDateToString(a: LocalDate): String {
-    val strYear = a.year.toString()
-    val strMonth = a.monthValue.toString().padStart(2, '0')
-    val strDay = a.dayOfMonth.toString().padStart(2, '0')
-
-    return "${strYear}-${strMonth}-${strDay}"
-}
+import util.CustomLocalDateHelper.transferLocalDateString
 
 fun printRoomReservation(reservations: ArrayList<Reservation>) {
     for (r in reservations) {
-        val strCheckIn = localDateToString(r.checkInDate)
-        val strCheckOut = localDateToString(r.checkOutDate)
+        val strCheckIn = transferLocalDateString(r.checkInDate)
+        val strCheckOut = transferLocalDateString(r.checkOutDate)
 
         val content = String.format("\t번호: %d", r.id) +
                     String.format("\t사용자: %5s", r.name) +
