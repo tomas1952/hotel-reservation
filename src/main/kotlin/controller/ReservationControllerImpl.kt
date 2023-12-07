@@ -2,6 +2,7 @@ package controller
 
 import Reservation
 import ReservationService
+import util.CustomLocalDateHelper.transferLocalDateString
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -24,6 +25,21 @@ class ReservationControllerImpl(
         )
 
         reservationService.add(reservation)
+    }
+
+    override fun printReservation(isSorted: Boolean) {
+        val reservations = reservationService.getAllReservations(isSorted)
+
+        for (r in reservations) {
+            val content = String.format(" 번호: %5s,", r.id.toString()) +
+                    String.format("\t사용자: %8s,", r.name) +
+                    String.format("\t방번호: %4s호,", r.roomNumber) +
+                    String.format("\t체크인: %10s,", transferLocalDateString(r.checkInDate)) +
+                    String.format("\t체크아웃: %10s,", transferLocalDateString(r.checkOutDate)) +
+                    String.format("\t요금: %7s", r.roomFee.toString())
+            println(content)
+        }
+        println("\r")
     }
 
     // private function
@@ -121,7 +137,7 @@ class ReservationControllerImpl(
             try {
                 reservationService.validateCheckInOutDate(roomNumber, checkIn, checkOut)
             } catch (e: Exception) {
-                println("해당 날짜는 체크아웃 할 수 없습니다.")
+                println("해당 날짜는 예약되어 있어 체크아웃 할 수 없습니다.")
                 continue
             }
 
