@@ -1,7 +1,10 @@
 package reservation
 
 import common.util.CustomLocalDateHelper.transferLocalDateString
+import common.util.RoomFeeCalculator
+import common.util.RoomFeeCalculator.calcRoomFee
 import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
 
 class ReservationControllerImpl(
@@ -19,7 +22,7 @@ class ReservationControllerImpl(
             roomNumber = roomNumber,
             checkInDate = checkIn,
             checkOutDate = checkOut,
-            roomFee = 10000
+            roomFee = calcRoomFee(checkIn, checkOut)
         )
 
         reservationService.add(reservation)
