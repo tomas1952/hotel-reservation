@@ -1,6 +1,14 @@
-package reservation
+package reservation.controller
 
+import common.exception.NotFoundResourceException
 import common.util.CustomLocalDateHelper.transferLocalDateString
+import common.util.RoomFeeCalculator.calcRoomFee
+import reservation.entity.AccountDetail
+import reservation.service.ReservationServiceImpl
+import reservation.entity.Reservation
+import reservation.enumeration.AccountDetailHistoryType
+import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
+import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,10 +27,10 @@ class ReservationControllerImpl(
             roomNumber = roomNumber,
             checkInDate = checkIn,
             checkOutDate = checkOut,
-            roomFee = 10000
+            roomFee = calcRoomFee(checkIn, checkOut)
         )
 
-        reservationService.add(reservation)
+        reservationService.addReservation(reservation)
     }
 
     override fun printReservation(isSorted: Boolean) {
@@ -39,6 +47,28 @@ class ReservationControllerImpl(
         }
         println("\r")
     }
+
+    override fun printAccountDetails() {
+        val result: ArrayList<AccountDetail> = arrayListOf()
+        try {
+            println("조회하실 사용자를 입력해주세요.")
+            val name = readln().trim()
+            result.addAll(reservationService.findAccountDetailByName(name))
+        } catch (_: NotFoundResourceException) {
+            println("예약된 사용자를 찾을 수 없습니다.")
+        }
+
+        result.forEach {
+            val dw = when(it.type) {
+                DEPOSIT -> "입금"
+                WITHDRAWAL -> "출금"
+            }
+
+            println("${it.id} : ${it.description}으로 ${it.amount}원 ${dw}되었습니다.")
+        }
+    }
+
+
 
     // private function
     private fun inputName(): String {
