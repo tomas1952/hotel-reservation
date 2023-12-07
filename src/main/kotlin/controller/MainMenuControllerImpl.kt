@@ -3,9 +3,9 @@ package controller
 import enumeration.MainMenuType
 class MainMenuControllerImpl : MainMenuController {
     override fun inputMainMenu(): MainMenuType {
-        val intCommandOrders = MainMenuType.entries.map { it.commandOrder.toInt() }
-        val minCommandOrder = intCommandOrders.min()
-        val maxCommandOrder = intCommandOrders.max()
+        val intCo = MainMenuType.entries.map { it.commandOrder.toInt() }
+        val minCo = intCo.min()
+        val maxCo = intCo.max()
 
         while(true) {
             print("메뉴: ")
@@ -15,7 +15,7 @@ class MainMenuControllerImpl : MainMenuController {
                 return menuType
             }
 
-            println("입력할 수 있는 명령어는 $minCommandOrder ~ $maxCommandOrder 사이 입니다.")
+            println("입력할 수 있는 명령어는 $minCo ~ $maxCo 사이 입니다.")
         }
     }
 
