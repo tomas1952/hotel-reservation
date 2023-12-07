@@ -1,4 +1,4 @@
-package reservation
+package reservation.controller
 
 interface ReservationController {
     fun inputReservation()

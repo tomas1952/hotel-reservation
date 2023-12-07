@@ -1,7 +1,7 @@
 import main.MainMenuControllerImpl
-import reservation.ReservationControllerImpl
+import reservation.controller.ReservationControllerImpl
 import common.enumeration.MainMenuType.*
-import reservation.ReservationServiceImpl
+import reservation.service.ReservationServiceImpl
 
 fun main(args: Array<String>) {
     println("호텔예약 프로그램 입니다.")

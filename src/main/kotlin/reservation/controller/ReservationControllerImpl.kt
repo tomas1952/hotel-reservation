@@ -1,10 +1,10 @@
-package reservation
+package reservation.controller
 
 import common.util.CustomLocalDateHelper.transferLocalDateString
-import common.util.RoomFeeCalculator
 import common.util.RoomFeeCalculator.calcRoomFee
+import reservation.service.ReservationServiceImpl
+import reservation.entity.Reservation
 import java.time.LocalDate
-import java.time.Period
 import java.time.format.DateTimeFormatter
 
 class ReservationControllerImpl(
@@ -25,7 +25,7 @@ class ReservationControllerImpl(
             roomFee = calcRoomFee(checkIn, checkOut)
         )
 
-        reservationService.add(reservation)
+        reservationService.addReservation(reservation)
     }
 
     override fun printReservation(isSorted: Boolean) {
