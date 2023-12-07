@@ -1,4 +1,4 @@
-package enumeration
+package common.enumeration
 
 enum class MainMenuType(
     val description: String,

@@ -1,6 +1,6 @@
-package controller
+package main
 
-import enumeration.MainMenuType
+import common.enumeration.MainMenuType
 class MainMenuControllerImpl : MainMenuController {
     override fun inputMainMenu(): MainMenuType {
         val intCo = MainMenuType.entries.map { it.commandOrder.toInt() }

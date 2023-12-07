@@ -1,14 +1,12 @@
-package controller
+package reservation
 
-import Reservation
-import ReservationService
-import util.CustomLocalDateHelper.transferLocalDateString
+import common.util.CustomLocalDateHelper.transferLocalDateString
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class ReservationControllerImpl(
     private val reservationService: ReservationService,
-) : ReservationController  {
+) : ReservationController {
     override fun inputReservation() {
         val name = inputName()
         val roomNumber = inputRoomNumber()

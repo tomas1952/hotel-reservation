@@ -1,3 +1,5 @@
+package reservation
+
 import java.time.LocalDate
 
 class Reservation(

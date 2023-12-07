@@ -1,5 +1,7 @@
-import exception.DuplicatedResourceException
-import exception.NotFoundResourceException
+package reservation
+
+import common.exception.DuplicatedResourceException
+import common.exception.NotFoundResourceException
 import java.time.LocalDate
 
 class ReservationService(

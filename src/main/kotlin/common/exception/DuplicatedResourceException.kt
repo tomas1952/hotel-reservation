@@ -1,4 +1,4 @@
-package exception
+package common.exception
 
 import java.lang.RuntimeException
 

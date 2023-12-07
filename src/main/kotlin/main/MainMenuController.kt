@@ -1,6 +1,6 @@
-package controller
+package main
 
-import enumeration.MainMenuType
+import common.enumeration.MainMenuType
 
 interface MainMenuController {
     fun inputMainMenu(): MainMenuType
