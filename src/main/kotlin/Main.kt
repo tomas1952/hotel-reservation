@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
                 reservationController.printAccountDetails()
             }
             RESERVATION_CHANGES -> {
-                TODO("NOT IMPLEMENTED")
+                reservationController.updateOrCancelReservation()
             }
         }
     }
