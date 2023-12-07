@@ -1,12 +1,12 @@
 import main.MainMenuControllerImpl
 import reservation.ReservationControllerImpl
 import common.enumeration.MainMenuType.*
-import reservation.ReservationService
+import reservation.ReservationServiceImpl
 
 fun main(args: Array<String>) {
     println("호텔예약 프로그램 입니다.")
 
-    val reservationService = ReservationService()
+    val reservationService = ReservationServiceImpl()
 
     val mmController = MainMenuControllerImpl()
     val rController = ReservationControllerImpl(

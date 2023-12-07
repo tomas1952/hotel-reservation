@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class ReservationControllerImpl(
-    private val reservationService: ReservationService,
+    private val reservationService: ReservationServiceImpl,
 ) : ReservationController {
     override fun inputReservation() {
         val name = inputName()
