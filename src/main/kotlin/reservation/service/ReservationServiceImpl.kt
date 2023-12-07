@@ -1,71 +1,62 @@
 package reservation.service
 
 import common.exception.DuplicatedResourceException
-import common.exception.NotFoundResourceException
-import reservation.entity.AccountDetailHistory
 import reservation.entity.Reservation
+import reservation.repository.AccountDetailRepository
+import reservation.repository.ReservationRepository
 import java.time.LocalDate
 
 class ReservationServiceImpl(
-    private val rRepository: ArrayList<Reservation> = arrayListOf(),
-    private val aRepository: ArrayList<AccountDetailHistory> = arrayListOf(),
+    private val rRepository: ReservationRepository,
+    private val aRepository: AccountDetailRepository,
 ) : ReservationService {
-    private var currentId = 0L
     override fun addReservation(r: Reservation) {
         validateCheckInOutDate(r.roomNumber, r.checkInDate, r.checkOutDate)
-
-        r.id = ++currentId
         rRepository.add(r)
     }
 
-    override fun validateCheckInDate(roomNumber: Int, date: LocalDate) {
-        val filtered = rRepository.filter {
-            it.roomNumber == roomNumber
-                    && (it.checkInDate.isEqual(date) || it.checkInDate.isBefore(date))
-                    && date.isBefore(it.checkOutDate)
-        }
-        if (filtered.isNotEmpty())
+    override fun validateCheckInDate(roomNumber: Int, checkIn: LocalDate) {
+        val result = rRepository.findAllByRoomNumberAndIncludeCheckInDate(
+            roomNumber = roomNumber,
+            checkIn = checkIn,
+        )
+
+        if (result.isNotEmpty())
             throw DuplicatedResourceException("예약")
     }
 
-    override fun validateCheckOutDate(roomNumber: Int, date: LocalDate) {
-        val filtered = rRepository.filter {
-            it.roomNumber == roomNumber
-                    && it.checkInDate.isBefore(date)
-                    && (date.isEqual(it.checkOutDate) || date.isBefore(it.checkOutDate))
-        }
-        if (filtered.isNotEmpty())
+    override fun validateCheckOutDate(roomNumber: Int, checkOut: LocalDate) {
+        val result = rRepository.findAllByRoomNumberAndIncludeCheckOutDate(
+            roomNumber = roomNumber,
+            checkOut = checkOut,
+        )
+
+        if (result.isNotEmpty())
             throw DuplicatedResourceException("예약")
     }
 
-    override fun validateCheckInOutDate(roomNumber: Int, checkInDate: LocalDate, checkOutDate: LocalDate) {
-        validateCheckInDate(roomNumber, checkInDate)
-        validateCheckOutDate(roomNumber, checkOutDate)
+    override fun validateCheckInOutDate(roomNumber: Int, checkIn: LocalDate, checkOut: LocalDate) {
+        validateCheckInDate(roomNumber, checkIn)
+        validateCheckOutDate(roomNumber, checkOut)
 
-        val filtered = rRepository.filter {
-            it.roomNumber == roomNumber
-                    && checkInDate.isBefore(it.checkInDate)
-                    && checkOutDate.isAfter(it.checkOutDate)
-        }
+        val result = rRepository.findAllByRoomNumberAndFullyIncludedCheckInCheckOut(
+            roomNumber = roomNumber,
+            checkIn = checkIn,
+            checkOut = checkOut,
+        )
 
-        if (filtered.isNotEmpty())
+        if (result.isNotEmpty())
             throw DuplicatedResourceException("예약")
     }
 
     override fun remove(id: Long) {
-        val filteredReservation = rRepository.filter { it.id == id }
-        if (filteredReservation.isEmpty()) {
-            throw NotFoundResourceException("예약")
-        }
-        rRepository.remove(filteredReservation.get(0))
+        rRepository.remove(id)
     }
 
-    override fun getAllReservations(isSorted: Boolean): ArrayList<Reservation> {
-        val list = if (isSorted) {
-            rRepository.sortedBy { it.checkInDate }.toList()
-        } else {
-            rRepository.toList()
-        }
-        return ArrayList(list)
+    override fun getAllReservations(isSorted: Boolean): ArrayList<Reservation> = if (isSorted) {
+        rRepository.findSortedAll()
+    } else {
+        rRepository.findAll()
     }
+
 }

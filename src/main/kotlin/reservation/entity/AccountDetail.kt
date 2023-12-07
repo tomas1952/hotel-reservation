@@ -2,7 +2,7 @@ package reservation.entity
 
 import reservation.enumeration.AccountDetailHistoryType
 
-class AccountDetailHistory(
+class AccountDetail(
     val name: String,
     val amount: Int,
     val type: AccountDetailHistoryType,
