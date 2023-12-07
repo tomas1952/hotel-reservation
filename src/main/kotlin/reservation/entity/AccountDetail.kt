@@ -4,6 +4,7 @@ import reservation.enumeration.AccountDetailHistoryType
 
 class AccountDetail(
     val name: String,
+    val description: String,
     val amount: Int,
     val type: AccountDetailHistoryType,
 ) {

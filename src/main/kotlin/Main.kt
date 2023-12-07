@@ -1,36 +1,44 @@
 import main.MainMenuControllerImpl
 import reservation.controller.ReservationControllerImpl
 import common.enumeration.MainMenuType.*
+import reservation.repository.AccountDetailRepository
+import reservation.repository.ReservationRepository
 import reservation.service.ReservationServiceImpl
 
 fun main(args: Array<String>) {
     println("호텔예약 프로그램 입니다.")
 
-    val reservationService = ReservationServiceImpl()
+    val reservationRepository = ReservationRepository()
+    val accountDetailRepository = AccountDetailRepository()
 
-    val mmController = MainMenuControllerImpl()
-    val rController = ReservationControllerImpl(
+    val reservationService = ReservationServiceImpl(
+        reservationRepository = reservationRepository,
+        accountDetailRepository = accountDetailRepository,
+    )
+
+    val mainMenuController = MainMenuControllerImpl()
+    val reservationController = ReservationControllerImpl(
         reservationService = reservationService
     )
 
     while(true) {
-        mmController.printMainMenu()
-        when(mmController.inputMainMenu()) {
+        mainMenuController.printMainMenu()
+        when(mainMenuController.inputMainMenu()) {
             RESERVATION -> {
-                rController.inputReservation()
+                reservationController.inputReservation()
             }
             RESERVATION_LIST -> {
-                rController.printReservation(false)
+                reservationController.printReservation(false)
             }
             SORTED_RESERVATION_LIST -> {
-                rController.printReservation(true)
+                reservationController.printReservation(true)
             }
             QUIT -> {
                 println("시스템을 종료 합니다.")
                 break;
             }
             DEPOSIT_WITHDRAWAL_HISTORY_LIST -> {
-                TODO("NOT IMPLEMENTED")
+                reservationController.printAccountDetails()
             }
             RESERVATION_CHANGES -> {
                 TODO("NOT IMPLEMENTED")

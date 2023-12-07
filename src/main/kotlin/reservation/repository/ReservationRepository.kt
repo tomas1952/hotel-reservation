@@ -7,7 +7,7 @@ class ReservationRepository : BaseRepository<Reservation> {
     private var currentId: Long = 0L
     private val repository: HashMap<Long, Reservation> = hashMapOf()
 
-    override fun add(resource: Reservation): Reservation {
+    override fun insert(resource: Reservation): Reservation {
         resource.id = ++currentId
         repository[currentId] = resource
         return resource
@@ -26,7 +26,7 @@ class ReservationRepository : BaseRepository<Reservation> {
         return ArrayList(repository.values.toList())
     }
 
-    override fun remove(id: Long) {
+    override fun delete(id: Long) {
         if (repository[id] == null)
             throw NotFoundResourceException("id가 일치하는 예약을 찾을 수 없습니다.")
 
@@ -51,7 +51,7 @@ class ReservationRepository : BaseRepository<Reservation> {
                         && checkIn.isBefore(it.checkOutDate)
             }
 
-        return ArrayList(result.toList())
+        return ArrayList(result)
     }
 
     fun findAllByRoomNumberAndIncludeCheckOutDate(
@@ -66,7 +66,7 @@ class ReservationRepository : BaseRepository<Reservation> {
                         && (checkOut.isEqual(it.checkOutDate) || checkOut.isBefore(it.checkOutDate))
             }
 
-        return ArrayList(result.toList())
+        return ArrayList(result)
     }
 
     fun findAllByRoomNumberAndFullyIncludedCheckInCheckOut(
@@ -82,7 +82,7 @@ class ReservationRepository : BaseRepository<Reservation> {
                         && checkOut.isAfter(it.checkOutDate)
         }
 
-        return ArrayList(result.toList())
+        return ArrayList(result)
     }
 
 }

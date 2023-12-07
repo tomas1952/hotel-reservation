@@ -1,22 +1,36 @@
 package reservation.service
 
 import common.exception.DuplicatedResourceException
+import common.exception.NotFoundResourceException
+import reservation.entity.AccountDetail
 import reservation.entity.Reservation
+import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
 import reservation.repository.AccountDetailRepository
 import reservation.repository.ReservationRepository
 import java.time.LocalDate
 
 class ReservationServiceImpl(
-    private val rRepository: ReservationRepository,
-    private val aRepository: AccountDetailRepository,
+    private val reservationRepository: ReservationRepository,
+    private val accountDetailRepository: AccountDetailRepository,
 ) : ReservationService {
-    override fun addReservation(r: Reservation) {
-        validateCheckInOutDate(r.roomNumber, r.checkInDate, r.checkOutDate)
-        rRepository.add(r)
+    override fun addReservation(reservation: Reservation) {
+        validateCheckInOutDate(reservation.roomNumber, reservation.checkInDate, reservation.checkOutDate)
+        reservationRepository.insert(reservation)
+
+        val accountDetail = reservation.let {
+            AccountDetail(
+                name = it.name,
+                amount = it.roomFee,
+                description = "예약금",
+                type = WITHDRAWAL
+            )
+        }
+
+        accountDetailRepository.insert(accountDetail)
     }
 
     override fun validateCheckInDate(roomNumber: Int, checkIn: LocalDate) {
-        val result = rRepository.findAllByRoomNumberAndIncludeCheckInDate(
+        val result = reservationRepository.findAllByRoomNumberAndIncludeCheckInDate(
             roomNumber = roomNumber,
             checkIn = checkIn,
         )
@@ -26,7 +40,7 @@ class ReservationServiceImpl(
     }
 
     override fun validateCheckOutDate(roomNumber: Int, checkOut: LocalDate) {
-        val result = rRepository.findAllByRoomNumberAndIncludeCheckOutDate(
+        val result = reservationRepository.findAllByRoomNumberAndIncludeCheckOutDate(
             roomNumber = roomNumber,
             checkOut = checkOut,
         )
@@ -39,7 +53,7 @@ class ReservationServiceImpl(
         validateCheckInDate(roomNumber, checkIn)
         validateCheckOutDate(roomNumber, checkOut)
 
-        val result = rRepository.findAllByRoomNumberAndFullyIncludedCheckInCheckOut(
+        val result = reservationRepository.findAllByRoomNumberAndFullyIncludedCheckInCheckOut(
             roomNumber = roomNumber,
             checkIn = checkIn,
             checkOut = checkOut,
@@ -50,13 +64,22 @@ class ReservationServiceImpl(
     }
 
     override fun remove(id: Long) {
-        rRepository.remove(id)
+        reservationRepository.delete(id)
     }
 
     override fun getAllReservations(isSorted: Boolean): ArrayList<Reservation> = if (isSorted) {
-        rRepository.findSortedAll()
+        reservationRepository.findSortedAll()
     } else {
-        rRepository.findAll()
+        reservationRepository.findAll()
     }
 
+    override fun findAccountDetailByName(name: String): ArrayList<AccountDetail> {
+        val result = accountDetailRepository.findAllByName(name)
+
+        if (result.isEmpty()) {
+            throw NotFoundResourceException("이름의 입출금 내역")
+        }
+
+        return result
+    }
 }
