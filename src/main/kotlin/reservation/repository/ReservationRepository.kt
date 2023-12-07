@@ -85,4 +85,14 @@ class ReservationRepository : BaseRepository<Reservation> {
         return ArrayList(result)
     }
 
+    fun findAllByName(
+        name: String,
+    ): ArrayList<Reservation> {
+        val result = repository
+            .map { it.value }
+            .filter { it.name == name }
+
+        return ArrayList(result)
+    }
+
 }

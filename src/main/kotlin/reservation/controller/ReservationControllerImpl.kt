@@ -4,11 +4,10 @@ import common.exception.NotFoundResourceException
 import common.util.CustomLocalDateHelper.transferLocalDateString
 import common.util.RoomFeeCalculator.calcRoomFee
 import reservation.entity.AccountDetail
-import reservation.service.ReservationServiceImpl
 import reservation.entity.Reservation
-import reservation.enumeration.AccountDetailHistoryType
 import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
 import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
+import reservation.service.ReservationServiceImpl
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -33,18 +32,10 @@ class ReservationControllerImpl(
         reservationService.addReservation(reservation)
     }
 
-    override fun printReservation(isSorted: Boolean) {
+    override fun printAllReservations(isSorted: Boolean) {
         val reservations = reservationService.getAllReservations(isSorted)
+        printReservations(reservations)
 
-        for (r in reservations) {
-            val content = String.format(" 번호: %5s,", r.id.toString()) +
-                    String.format("\t사용자: %8s,", r.name) +
-                    String.format("\t방번호: %4s호,", r.roomNumber) +
-                    String.format("\t체크인: %10s,", transferLocalDateString(r.checkInDate)) +
-                    String.format("\t체크아웃: %10s,", transferLocalDateString(r.checkOutDate)) +
-                    String.format("\t요금: %7s", r.roomFee.toString())
-            println(content)
-        }
         println("\r")
     }
 
@@ -68,7 +59,22 @@ class ReservationControllerImpl(
         }
     }
 
+    override fun updateOrCancelReservation() {
+        println("예약을 변경할 사용자 이름을 입력하세요")
+        val name = readln().trim()
+        val reservations = reservationService.findReservationsByName(name)
 
+        if (reservations.isEmpty()) {
+            println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.")
+            return
+        }
+
+        printReservations(reservations)
+        while(false) {
+
+        }
+        TODO("Not yet implemented")
+    }
 
     // private function
     private fun inputName(): String {
@@ -170,6 +176,18 @@ class ReservationControllerImpl(
             }
 
             return checkOut
+        }
+    }
+
+    private fun printReservations(reservations: ArrayList<Reservation>) {
+        for (r in reservations) {
+            val content = String.format(" 번호: %5s,", r.id.toString()) +
+                    String.format("\t사용자: %8s,", r.name) +
+                    String.format("\t방번호: %4s호,", r.roomNumber) +
+                    String.format("\t체크인: %10s,", transferLocalDateString(r.checkInDate)) +
+                    String.format("\t체크아웃: %10s,", transferLocalDateString(r.checkOutDate)) +
+                    String.format("\t요금: %7s", r.roomFee.toString())
+            println(content)
         }
     }
 }

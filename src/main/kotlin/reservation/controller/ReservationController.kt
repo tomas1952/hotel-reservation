@@ -2,7 +2,7 @@ package reservation.controller
 
 interface ReservationController {
     fun inputReservation()
-    fun printReservation(isSorted: Boolean)
-
+    fun printAllReservations(isSorted: Boolean)
     fun printAccountDetails()
+    fun updateOrCancelReservation()
 }

@@ -11,6 +11,6 @@ interface ReservationService {
     fun validateCheckInOutDate(roomNumber: Int, checkIn: LocalDate, checkOut: LocalDate)
     fun remove(id: Long)
     fun getAllReservations(isSorted: Boolean = false): ArrayList<Reservation>
-
     fun findAccountDetailByName(name: String): ArrayList<AccountDetail>
+    fun findReservationsByName(name: String): ArrayList<Reservation>
 }

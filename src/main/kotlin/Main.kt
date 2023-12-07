@@ -28,10 +28,10 @@ fun main(args: Array<String>) {
                 reservationController.inputReservation()
             }
             RESERVATION_LIST -> {
-                reservationController.printReservation(false)
+                reservationController.printAllReservations(false)
             }
             SORTED_RESERVATION_LIST -> {
-                reservationController.printReservation(true)
+                reservationController.printAllReservations(true)
             }
             QUIT -> {
                 println("시스템을 종료 합니다.")

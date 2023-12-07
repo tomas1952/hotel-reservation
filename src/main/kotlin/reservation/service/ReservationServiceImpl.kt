@@ -82,4 +82,8 @@ class ReservationServiceImpl(
 
         return result
     }
+
+    override fun findReservationsByName(name: String): ArrayList<Reservation> {
+        return reservationRepository.findAllByName(name)
+    }
 }
