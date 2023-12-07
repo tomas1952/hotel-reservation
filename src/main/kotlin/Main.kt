@@ -1,19 +1,9 @@
+import controller.MainMenuControllerImpl
+import enumeration.MainMenuType.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-fun inputAvailableMenu(): Int {
-    var curInput = "0"
-    val availableString = setOf("1", "2", "3", "4", "5", "6")
-    while(true) {
-        print("메뉴: ")
-        curInput = readln()
-        if (availableString.contains(curInput.trim())) {
-            return curInput.toInt()
-        }
-        println("입력할 수 있는 명령어는 1,2,3,4,5,6 입니다.")
-    }
-}
 fun inputRoomReservation(reservationService: ReservationService): Reservation {
     var name = ""
     while(true) {
@@ -138,34 +128,35 @@ fun printRoomReservation(reservations: ArrayList<Reservation>) {
 
 fun main(args: Array<String>) {
     println("호텔예약 프로그램 입니다.")
+
     val reservationService = ReservationService()
+    val mmController = MainMenuControllerImpl()
 
-    var lastedInput = 0
     while(true) {
-        println("===============================================[메뉴]===============================================")
-        println("1.방예약    2.예약목록 출력    3.예약목록 (정렬) 출력    4.시스템 종료    5.금액 입금-출금 내역 목록 출력    6.예약 변경")
-        println("===================================================================================================")
-
-        val command = inputAvailableMenu()
+        mmController.printMainMenu()
+        val command = mmController.inputMainMenu()
         when(command) {
-            1 -> {
+            RESERVATION -> {
                 val reservation = inputRoomReservation(reservationService)
                 reservationService.add(reservation)
             }
-            2 -> {
+            RESERVATION_LIST -> {
                 val reservations = reservationService.getAllReservations()
                 printRoomReservation(reservations)
             }
-            3 -> {
+            SORTED_RESERVATION_LIST -> {
                 val reservations = reservationService.getAllReservations(isSorted = true)
                 printRoomReservation(reservations)
             }
-            4 -> {
+            QUIT -> {
                 println("시스템을 종료 합니다.")
                 break;
             }
-            else -> {
-                println("TBD")
+            DEPOSIT_WITHDRAWAL_HISTORY_LIST -> {
+                TODO("NOT IMPLEMENTED")
+            }
+            RESERVATION_CHANGES -> {
+                TODO("NOT IMPLEMENTED")
             }
         }
     }
