@@ -21,6 +21,7 @@ class ReservationControllerImpl(
         val checkOut = inputCheckOutDate(roomNumber, checkIn)
         println("\r")
 
+        // TODO: service로
         val reservation = Reservation(
             name = name,
             roomNumber = roomNumber,
@@ -62,18 +63,81 @@ class ReservationControllerImpl(
     override fun updateOrCancelReservation() {
         println("예약을 변경할 사용자 이름을 입력하세요")
         val name = readln().trim()
-        val reservations = reservationService.findReservationsByName(name)
+        while(true) {
+            val reservations = reservationService.findReservationsByName(name)
 
-        if (reservations.isEmpty()) {
-            println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.")
-            return
+            if (reservations.isEmpty()) {
+                println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.")
+                return
+            }
+
+            println("$name 님이 예약한 목록입니다. 변경하실 예약번호를 입력해주세요. 탈출은 exit 입력")
+
+            printReservations(reservations)
+
+            print("입력: ")
+            val rawCommand = readln().trim()
+
+            if (rawCommand == "exit"){
+                println("예약 변경/취소 화면을 나갑니다.")
+                break
+            }
+
+            var id = -1L
+            try {
+                id = rawCommand.toLong()
+            } catch (e: Exception) {
+                println("숫자를 입력해주세요.")
+                continue
+            }
+
+            val target = reservations.filter { it.id == id }
+
+            if (target.isEmpty()) {
+                println("범위에 없는 예약번호 입니다.")
+                continue
+            }
+
+            val reservation = target.first()
+
+            println("해당 예약을 어떻게 하시겠습니까? (1: 변경, 2: 취소, 이외 번호: 메뉴로 돌아가기")
+            val updateOrDelete = readln().trim()
+            when(updateOrDelete) {
+                "1" -> {
+                    println("체크인/체크아웃 날짜를 변경할 수 있습니다.")
+                    val checkIn = inputCheckInDate(reservation.roomNumber)
+                    val checkOut = inputCheckOutDate(reservation.roomNumber, checkIn)
+
+                    // TODO: service로
+                    val newReservation = Reservation(
+                        name = reservation.name,
+                        roomNumber = reservation.roomNumber,
+                        checkInDate = checkIn,
+                        checkOutDate = checkOut,
+                        roomFee = calcRoomFee(checkIn, checkOut),
+                    )
+
+                    reservationService.updateReservation(
+                        id = id,
+                        updateReservation = newReservation
+                    )
+                }
+                "2" -> {
+                    println("[취소 유의사항]")
+                    println("체크인 3일 이전 취소 예약금 환불 불가")
+                    println("체크인 5일 이전 취소 예약금의 30% 환불")
+                    println("체크인 7일 이전 취소 예약금의 50% 환불")
+                    println("체크인 14일 이전 취소 예약금의 80% 환불")
+                    println("체크인 30일 이전 취소 예약금의 100% 환불")
+
+                    reservationService.remove(reservation.id)
+
+                    println("취소가 완료되었습니다.")
+                }
+            }
+
         }
 
-        printReservations(reservations)
-        while(false) {
-
-        }
-        TODO("Not yet implemented")
     }
 
     // private function

@@ -2,8 +2,10 @@ package reservation.service
 
 import common.exception.DuplicatedResourceException
 import common.exception.NotFoundResourceException
+import common.util.RoomFeeCalculator.calcRefundRoomFee
 import reservation.entity.AccountDetail
 import reservation.entity.Reservation
+import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
 import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
 import reservation.repository.AccountDetailRepository
 import reservation.repository.ReservationRepository
@@ -27,6 +29,33 @@ class ReservationServiceImpl(
         }
 
         accountDetailRepository.insert(accountDetail)
+    }
+
+    override fun updateReservation(id: Long, updateReservation: Reservation) {
+        val reservation = reservationRepository.findById(id)
+
+        val refund = reservation.let {
+            AccountDetail(
+                name = it.name,
+                amount = it.roomFee,
+                description = "환불",
+                type = DEPOSIT
+            )
+        }
+        accountDetailRepository.insert(refund)
+
+        reservationRepository.update(id, updateReservation)
+
+        val withdraw = updateReservation.let {
+            AccountDetail(
+                name = it.name,
+                amount = it.roomFee,
+                description = "예약금",
+                type = WITHDRAWAL
+            )
+        }
+
+        accountDetailRepository.insert(withdraw)
     }
 
     override fun validateCheckInDate(roomNumber: Int, checkIn: LocalDate) {
@@ -64,7 +93,23 @@ class ReservationServiceImpl(
     }
 
     override fun remove(id: Long) {
+        val r = reservationRepository.findById(id)
+
         reservationRepository.delete(id)
+
+        val refundRoomFee = calcRefundRoomFee(
+            r.checkInDate,
+            r.roomFee
+        )
+
+        val accountDetail = AccountDetail(
+            name = r.name,
+            amount = refundRoomFee,
+            description = "환불",
+            type = DEPOSIT
+        )
+
+        accountDetailRepository.insert(accountDetail)
     }
 
     override fun getAllReservations(isSorted: Boolean): ArrayList<Reservation> = if (isSorted) {

@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 interface ReservationService {
     fun addReservation(reservation: Reservation)
+    fun updateReservation(id: Long, updateReservation: Reservation)
     fun validateCheckInDate(roomNumber: Int, checkIn: LocalDate)
     fun validateCheckOutDate(roomNumber: Int, checkOut: LocalDate)
     fun validateCheckInOutDate(roomNumber: Int, checkIn: LocalDate, checkOut: LocalDate)
