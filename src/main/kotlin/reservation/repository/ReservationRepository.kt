@@ -15,11 +15,20 @@ class ReservationRepository : BaseRepository<Reservation> {
 
     override fun update(id: Long, resource: Reservation): Reservation {
         if (repository[id] == null)
-            throw NotFoundResourceException("id가 일치하는 예약을 찾을 수 없습니다.")
+            throw NotFoundResourceException("에약")
 
         resource.id = id
         repository[id] = resource
         return resource
+    }
+
+    override fun findById(id: Long): Reservation {
+        val result = repository.values.filter { it.id == id }
+
+        if (result.isEmpty())
+            throw NotFoundResourceException("예약")
+
+        return result.first()
     }
 
     override fun findAll(): ArrayList<Reservation> {
@@ -28,7 +37,7 @@ class ReservationRepository : BaseRepository<Reservation> {
 
     override fun delete(id: Long) {
         if (repository[id] == null)
-            throw NotFoundResourceException("id가 일치하는 예약을 찾을 수 없습니다.")
+            throw NotFoundResourceException("예약")
 
         repository.remove(id)
     }
@@ -44,7 +53,7 @@ class ReservationRepository : BaseRepository<Reservation> {
         checkIn: LocalDate,
     ): ArrayList<Reservation> {
         val result = repository
-            .map { it.value }
+            .values
             .filter {
                 it.roomNumber == roomNumber
                         && (it.checkInDate.isEqual(checkIn) || it.checkInDate.isBefore(checkIn))
@@ -58,8 +67,7 @@ class ReservationRepository : BaseRepository<Reservation> {
         roomNumber: Int,
         checkOut: LocalDate,
     ): ArrayList<Reservation> {
-        val result = repository
-            .map { it.value }
+        val result = repository.values
             .filter {
                 it.roomNumber == roomNumber
                         && it.checkInDate.isBefore(checkOut)
@@ -74,13 +82,21 @@ class ReservationRepository : BaseRepository<Reservation> {
         checkIn: LocalDate,
         checkOut: LocalDate,
     ): ArrayList<Reservation> {
-        val result = repository
-            .map { it.value }
+        val result = repository.values
             .filter {
                 it.roomNumber == roomNumber
                         && checkIn.isBefore(it.checkInDate)
                         && checkOut.isAfter(it.checkOutDate)
         }
+
+        return ArrayList(result)
+    }
+
+    fun findAllByName(
+        name: String,
+    ): ArrayList<Reservation> {
+        val result = repository.values
+            .filter { it.name == name }
 
         return ArrayList(result)
     }

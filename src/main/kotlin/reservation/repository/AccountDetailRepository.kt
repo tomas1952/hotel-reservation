@@ -1,5 +1,6 @@
 package reservation.repository
 
+import common.exception.NotFoundResourceException
 import reservation.entity.AccountDetail
 
 class AccountDetailRepository: BaseRepository<AccountDetail> {
@@ -13,6 +14,14 @@ class AccountDetailRepository: BaseRepository<AccountDetail> {
 
     override fun update(id: Long, resource: AccountDetail): AccountDetail {
         TODO("Not yet implemented")
+    }
+
+    override fun findById(id: Long): AccountDetail {
+        val result = repository.values.filter { it.id == id }
+        if (result.isEmpty())
+            throw NotFoundResourceException("입출금내역")
+
+        return result.first()
     }
 
     override fun findAll(): ArrayList<AccountDetail> {
