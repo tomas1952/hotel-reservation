@@ -1,12 +1,9 @@
 package reservation.controller
 
 import common.exception.NotFoundResourceException
-import common.util.CustomLocalDateHelper.transferLocalDateString
-import common.util.RoomFeeCalculator.calcRoomFee
-import reservation.entity.AccountDetail
-import reservation.entity.Reservation
-import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
-import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
+import reservation.dto.AccountDetailReadDto
+import reservation.dto.ReservationCreateDto
+import reservation.dto.ReservationReadDto
 import reservation.service.ReservationServiceImpl
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -21,27 +18,25 @@ class ReservationControllerImpl(
         val checkOut = inputCheckOutDate(roomNumber, checkIn)
         println("\r")
 
-        // TODO: service로
-        val reservation = Reservation(
+        val reservationDto = ReservationCreateDto(
             name = name,
             roomNumber = roomNumber,
-            checkInDate = checkIn,
-            checkOutDate = checkOut,
-            roomFee = calcRoomFee(checkIn, checkOut)
+            checkIn = checkIn,
+            checkOut = checkOut,
         )
 
-        reservationService.addReservation(reservation)
+        reservationService.addReservation(reservationDto)
     }
 
     override fun printAllReservations(isSorted: Boolean) {
         val reservations = reservationService.getAllReservations(isSorted)
         printReservations(reservations)
 
-        println("\r")
+        println()
     }
 
     override fun printAccountDetails() {
-        val result: ArrayList<AccountDetail> = arrayListOf()
+        val result: ArrayList<AccountDetailReadDto> = arrayListOf()
         try {
             println("조회하실 사용자를 입력해주세요.")
             val name = readln().trim()
@@ -51,12 +46,7 @@ class ReservationControllerImpl(
         }
 
         result.forEach {
-            val dw = when(it.type) {
-                DEPOSIT -> "입금"
-                WITHDRAWAL -> "출금"
-            }
-
-            println("${it.id} : ${it.description}으로 ${it.amount}원 ${dw}되었습니다.")
+            println("${it.id} : ${it.description}으로 ${it.amount}원 ${it.typeKoreanName}되었습니다.")
         }
     }
 
@@ -72,14 +62,13 @@ class ReservationControllerImpl(
             }
 
             println("$name 님이 예약한 목록입니다. 변경하실 예약번호를 입력해주세요. 탈출은 exit 입력")
-
             printReservations(reservations)
 
             print("입력: ")
             val rawCommand = readln().trim()
 
             if (rawCommand == "exit"){
-                println("예약 변경/취소 화면을 나갑니다.")
+                println("예약 변경/취소 화면을 나갑니다.\n")
                 break
             }
 
@@ -109,17 +98,16 @@ class ReservationControllerImpl(
                     val checkOut = inputCheckOutDate(reservation.roomNumber, checkIn)
 
                     // TODO: service로
-                    val newReservation = Reservation(
+                    val updateDto = ReservationCreateDto(
                         name = reservation.name,
                         roomNumber = reservation.roomNumber,
-                        checkInDate = checkIn,
-                        checkOutDate = checkOut,
-                        roomFee = calcRoomFee(checkIn, checkOut),
+                        checkIn = checkIn,
+                        checkOut = checkOut,
                     )
 
                     reservationService.updateReservation(
                         id = id,
-                        updateReservation = newReservation
+                        updateDto = updateDto
                     )
                 }
                 "2" -> {
@@ -243,13 +231,13 @@ class ReservationControllerImpl(
         }
     }
 
-    private fun printReservations(reservations: ArrayList<Reservation>) {
+    private fun printReservations(reservations: ArrayList<ReservationReadDto>) {
         for (r in reservations) {
             val content = String.format(" 번호: %5s,", r.id.toString()) +
                     String.format("\t사용자: %8s,", r.name) +
                     String.format("\t방번호: %4s호,", r.roomNumber) +
-                    String.format("\t체크인: %10s,", transferLocalDateString(r.checkInDate)) +
-                    String.format("\t체크아웃: %10s,", transferLocalDateString(r.checkOutDate)) +
+                    String.format("\t체크인: %10s,", r.checkIn) +
+                    String.format("\t체크아웃: %10s,", r.checkOut) +
                     String.format("\t요금: %7s", r.roomFee.toString())
             println(content)
         }

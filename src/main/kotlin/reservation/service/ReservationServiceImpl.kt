@@ -3,8 +3,10 @@ package reservation.service
 import common.exception.DuplicatedResourceException
 import common.exception.NotFoundResourceException
 import common.util.RoomFeeCalculator.calcRefundRoomFee
+import reservation.dto.AccountDetailReadDto
+import reservation.dto.ReservationCreateDto
+import reservation.dto.ReservationReadDto
 import reservation.entity.AccountDetail
-import reservation.entity.Reservation
 import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
 import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
 import reservation.repository.AccountDetailRepository
@@ -15,11 +17,11 @@ class ReservationServiceImpl(
     private val reservationRepository: ReservationRepository,
     private val accountDetailRepository: AccountDetailRepository,
 ) : ReservationService {
-    override fun addReservation(reservation: Reservation) {
-        validateCheckInOutDate(reservation.roomNumber, reservation.checkInDate, reservation.checkOutDate)
-        reservationRepository.insert(reservation)
+    override fun addReservation(createDto: ReservationCreateDto) {
+        validateCheckInOutDate(createDto.roomNumber, createDto.checkIn, createDto.checkOut)
+        val entity = reservationRepository.insert(createDto.toReservation())
 
-        val accountDetail = reservation.let {
+        val accountDetail = entity.let {
             AccountDetail(
                 name = it.name,
                 amount = it.roomFee,
@@ -31,10 +33,10 @@ class ReservationServiceImpl(
         accountDetailRepository.insert(accountDetail)
     }
 
-    override fun updateReservation(id: Long, updateReservation: Reservation) {
-        val reservation = reservationRepository.findById(id)
+    override fun updateReservation(id: Long, updateDto: ReservationCreateDto) {
+        val entity = reservationRepository.findById(id)
 
-        val refund = reservation.let {
+        val refund = entity.let {
             AccountDetail(
                 name = it.name,
                 amount = it.roomFee,
@@ -44,9 +46,9 @@ class ReservationServiceImpl(
         }
         accountDetailRepository.insert(refund)
 
-        reservationRepository.update(id, updateReservation)
+        val updatedEntity = reservationRepository.update(id, updateDto.toReservation())
 
-        val withdraw = updateReservation.let {
+        val withdraw = updatedEntity.let {
             AccountDetail(
                 name = it.name,
                 amount = it.roomFee,
@@ -112,23 +114,29 @@ class ReservationServiceImpl(
         accountDetailRepository.insert(accountDetail)
     }
 
-    override fun getAllReservations(isSorted: Boolean): ArrayList<Reservation> = if (isSorted) {
-        reservationRepository.findSortedAll()
-    } else {
-        reservationRepository.findAll()
+    override fun getAllReservations(isSorted: Boolean): ArrayList<ReservationReadDto> {
+        val entities = if (isSorted) {
+            reservationRepository.findSortedAll()
+        } else {
+            reservationRepository.findAll()
+        }
+
+        return ArrayList(entities.map(ReservationReadDto::from).toList())
     }
 
-    override fun findAccountDetailByName(name: String): ArrayList<AccountDetail> {
-        val result = accountDetailRepository.findAllByName(name)
 
+    override fun findAccountDetailByName(name: String): ArrayList<AccountDetailReadDto> {
+        val result = accountDetailRepository.findAllByName(name)
         if (result.isEmpty()) {
             throw NotFoundResourceException("이름의 입출금 내역")
         }
 
-        return result
+        return ArrayList(result.map(AccountDetailReadDto::from).toList())
     }
 
-    override fun findReservationsByName(name: String): ArrayList<Reservation> {
-        return reservationRepository.findAllByName(name)
+    override fun findReservationsByName(name: String): ArrayList<ReservationReadDto> {
+        val result = reservationRepository.findAllByName(name)
+
+        return ArrayList(result.map(ReservationReadDto::from).toList())
     }
 }
