@@ -50,12 +50,18 @@ class ReservationControllerImpl(
         }
     }
 
+    private fun inputChangeableReservation(
+        reservations: ArrayList<ReservationReadDto>
+    ): Pair<Int, ReservationReadDto> {
+
+    }
+
     override fun updateOrCancelReservation() {
         println("예약을 변경할 사용자 이름을 입력하세요")
         val name = readln().trim()
+
         while(true) {
             val reservations = reservationService.findReservationsByName(name)
-
             if (reservations.isEmpty()) {
                 println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.")
                 return
@@ -66,28 +72,23 @@ class ReservationControllerImpl(
 
             print("입력: ")
             val rawCommand = readln().trim()
-
             if (rawCommand == "exit"){
                 println("예약 변경/취소 화면을 나갑니다.\n")
-                break
+                return
             }
 
-            var id = -1L
-            try {
-                id = rawCommand.toLong()
+            val id = try {
+                rawCommand.toLong()
             } catch (e: Exception) {
                 println("숫자를 입력해주세요.")
                 continue
             }
 
-            val target = reservations.filter { it.id == id }
-
-            if (target.isEmpty()) {
+            val reservation = reservations.filter { it.id == id }.firstOrNull()
+            if (reservation == null) {
                 println("범위에 없는 예약번호 입니다.")
                 continue
             }
-
-            val reservation = target.first()
 
             println("해당 예약을 어떻게 하시겠습니까? (1: 변경, 2: 취소, 이외 번호: 메뉴로 돌아가기")
             val updateOrDelete = readln().trim()
@@ -97,7 +98,6 @@ class ReservationControllerImpl(
                     val checkIn = inputCheckInDate(reservation.roomNumber)
                     val checkOut = inputCheckOutDate(reservation.roomNumber, checkIn)
 
-                    // TODO: service로
                     val updateDto = ReservationCreateDto(
                         name = reservation.name,
                         roomNumber = reservation.roomNumber,
@@ -121,6 +121,9 @@ class ReservationControllerImpl(
                     reservationService.remove(reservation.id)
 
                     println("취소가 완료되었습니다.")
+                }
+                else -> {
+                    return
                 }
             }
 
@@ -146,9 +149,8 @@ class ReservationControllerImpl(
         while(true) {
             println("예약자할 방번호를 입력해주세요")
             val raw = readln().trim()
-            var roomNumber = -1
-            try {
-                roomNumber = raw.toInt()
+            val roomNumber = try {
+                raw.toInt()
             } catch (e: Exception) {
                 println("방번호는 숫자를 입력해주세요!!!")
                 continue
@@ -172,11 +174,9 @@ class ReservationControllerImpl(
             val now = LocalDate.now()
             println("체크인 날짜를 입력해주세요. (e.g.: 20230631)")
 
-            val raw = readln()
-            var checkIn: LocalDate
-
-            try {
-                checkIn = LocalDate.parse(raw, dateFormat)
+            val raw = readln().trim()
+            val checkIn = try {
+                LocalDate.parse(raw, dateFormat)
             } catch (e: Exception) {
                 println("올바른 날짜 형식이 아닙니다.")
                 continue
@@ -207,12 +207,13 @@ class ReservationControllerImpl(
 
         while(true) {
             println("체크아웃 날짜를 입력해주세요. (e.g.: 20230631)")
-            val raw = readln()
-            var checkOut = LocalDate.MIN
-            try {
-                checkOut = LocalDate.parse(raw, dateFormat)
+            val raw = readln().trim()
+
+            val checkOut = try {
+                LocalDate.parse(raw, dateFormat)
             } catch (e: Exception) {
                 println("올바른 날짜 형식이 아닙니다.")
+                continue
             }
 
             if (checkOut.isEqual(checkIn) || checkOut.isBefore(checkIn)) {
