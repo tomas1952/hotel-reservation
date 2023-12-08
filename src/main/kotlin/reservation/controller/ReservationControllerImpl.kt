@@ -36,10 +36,10 @@ class ReservationControllerImpl(
     }
 
     override fun printAccountDetails() {
+        val name = inputName()
         val result: ArrayList<AccountDetailReadDto> = arrayListOf()
+
         try {
-            println("조회하실 사용자를 입력해주세요.")
-            val name = readln().trim()
             result.addAll(reservationService.findAccountDetailByName(name))
         } catch (_: NotFoundResourceException) {
             println("예약된 사용자를 찾을 수 없습니다.")
@@ -51,8 +51,7 @@ class ReservationControllerImpl(
     }
 
     override fun updateOrCancelReservation() {
-        println("예약을 변경할 사용자 이름을 입력하세요")
-        val name = readln().trim()
+        val name = inputName()
 
         while(true) {
             val reservations = reservationService.findReservationsByName(name)
