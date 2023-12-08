@@ -7,8 +7,8 @@ import reservation.dto.AccountDetailReadDto
 import reservation.dto.ReservationCreateDto
 import reservation.dto.ReservationReadDto
 import reservation.entity.AccountDetail
-import reservation.enumeration.AccountDetailHistoryType.DEPOSIT
-import reservation.enumeration.AccountDetailHistoryType.WITHDRAWAL
+import reservation.enumeration.AccountDetailType.DEPOSIT
+import reservation.enumeration.AccountDetailType.WITHDRAWAL
 import reservation.repository.AccountDetailRepository
 import reservation.repository.ReservationRepository
 import java.time.LocalDate

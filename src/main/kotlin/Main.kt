@@ -5,7 +5,7 @@ import reservation.repository.AccountDetailRepository
 import reservation.repository.ReservationRepository
 import reservation.service.ReservationServiceImpl
 
-fun main(args: Array<String>) {
+fun main() {
     println("호텔예약 프로그램 입니다.")
 
     val reservationRepository = ReservationRepository()

@@ -1,7 +1,7 @@
 package reservation.dto
 
 import reservation.entity.AccountDetail
-import reservation.enumeration.AccountDetailHistoryType
+import reservation.enumeration.AccountDetailType
 
 data class AccountDetailReadDto(
     val id: Long,
@@ -15,8 +15,8 @@ data class AccountDetailReadDto(
             accountDetail: AccountDetail
         ): AccountDetailReadDto {
             val typeKoreanName = when (accountDetail.type) {
-                AccountDetailHistoryType.DEPOSIT -> "입금"
-                AccountDetailHistoryType.WITHDRAWAL -> "출금"
+                AccountDetailType.DEPOSIT -> "입금"
+                AccountDetailType.WITHDRAWAL -> "출금"
             }
 
             return AccountDetailReadDto(

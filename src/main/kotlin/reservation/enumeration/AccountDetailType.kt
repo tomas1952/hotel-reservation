@@ -1,6 +1,6 @@
 package reservation.enumeration
 
-enum class AccountDetailHistoryType(
+enum class AccountDetailType(
     val typeName: String,
 ) {
     DEPOSIT("DEPOSIT"),

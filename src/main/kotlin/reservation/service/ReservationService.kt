@@ -6,8 +6,8 @@ import reservation.dto.ReservationReadDto
 import java.time.LocalDate
 
 interface ReservationService {
-    fun addReservation(reservation: ReservationCreateDto)
-    fun updateReservation(id: Long, updateReservation: ReservationCreateDto)
+    fun addReservation(createDto: ReservationCreateDto)
+    fun updateReservation(id: Long, updateDto: ReservationCreateDto)
     fun validateCheckInDate(roomNumber: Int, checkIn: LocalDate)
     fun validateCheckOutDate(roomNumber: Int, checkOut: LocalDate)
     fun validateCheckInOutDate(roomNumber: Int, checkIn: LocalDate, checkOut: LocalDate)
