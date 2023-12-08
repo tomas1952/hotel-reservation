@@ -32,6 +32,10 @@ class AccountDetailRepository: BaseRepository<AccountDetail> {
         TODO("Not yet implemented")
     }
 
+    override fun clearAll() {
+        repository.clear()
+    }
+
     fun findAllByName(name: String) : ArrayList<AccountDetail> {
         val result = repository
             .map { it.value }

@@ -6,4 +6,5 @@ interface BaseRepository<T> {
     fun findById(id: Long): T
     fun findAll(): ArrayList<T>
     fun delete(id: Long)
+    fun clearAll()
 }

@@ -42,6 +42,10 @@ class ReservationRepository : BaseRepository<Reservation> {
         repository.remove(id)
     }
 
+    override fun clearAll() {
+        repository.clear()
+    }
+
     fun findSortedAll(): ArrayList<Reservation> {
         val result = findAll()
         result.sortBy { it.checkInDate }
