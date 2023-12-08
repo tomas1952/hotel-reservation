@@ -16,7 +16,6 @@ class ReservationControllerImpl(
         val roomNumber = inputRoomNumber()
         val checkIn = inputCheckInDate(roomNumber)
         val checkOut = inputCheckOutDate(roomNumber, checkIn)
-        println("\r")
 
         val reservationDto = ReservationCreateDto(
             name = name,
@@ -26,13 +25,14 @@ class ReservationControllerImpl(
         )
 
         reservationService.addReservation(reservationDto)
+        print("\n\n")
     }
 
     override fun printAllReservations(isSorted: Boolean) {
         val reservations = reservationService.getAllReservations(isSorted)
         printReservations(reservations)
 
-        println()
+        print("\n\n")
     }
 
     override fun printAccountDetails() {
@@ -48,6 +48,8 @@ class ReservationControllerImpl(
         result.forEach {
             println("${it.id} : ${it.description}으로 ${it.amount}원 ${it.typeKoreanName}되었습니다.")
         }
+
+        print("\n\n")
     }
 
     override fun updateOrCancelReservation() {
@@ -56,8 +58,8 @@ class ReservationControllerImpl(
         while(true) {
             val reservations = reservationService.findReservationsByName(name)
             if (reservations.isEmpty()) {
-                println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.")
-                return
+                println("사용자 이름으로 예약된 목록을 찾을 수 없습니다.\n\n")
+                break
             }
 
             println("$name 님이 예약한 목록입니다. 변경하실 예약번호를 입력해주세요. 탈출은 exit 입력")
@@ -66,20 +68,20 @@ class ReservationControllerImpl(
             print("입력: ")
             val rawCommand = readln().trim()
             if (rawCommand == "exit"){
-                println("예약 변경/취소 화면을 나갑니다.\n")
-                return
+                println("예약 변경/취소 화면을 나갑니다.\n\n")
+                break
             }
 
             val id = try {
                 rawCommand.toLong()
             } catch (e: Exception) {
-                println("숫자를 입력해주세요.")
+                println("숫자를 입력해주세요.\n")
                 continue
             }
 
             val reservation = reservations.filter { it.id == id }.firstOrNull()
             if (reservation == null) {
-                println("범위에 없는 예약번호 입니다.")
+                println("범위에 없는 예약번호 입니다.\n")
                 continue
             }
 
@@ -102,6 +104,8 @@ class ReservationControllerImpl(
                         id = id,
                         updateDto = updateDto
                     )
+
+                    println("변경이 완료되었습니다.\n")
                 }
                 "2" -> {
                     println("[취소 유의사항]")
@@ -113,11 +117,9 @@ class ReservationControllerImpl(
 
                     reservationService.remove(reservation.id)
 
-                    println("취소가 완료되었습니다.")
+                    println("취소가 완료되었습니다.\n")
                 }
-                else -> {
-                    return
-                }
+                else -> break
             }
 
         }
