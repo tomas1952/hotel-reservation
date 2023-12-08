@@ -50,12 +50,6 @@ class ReservationControllerImpl(
         }
     }
 
-    private fun inputChangeableReservation(
-        reservations: ArrayList<ReservationReadDto>
-    ): Pair<Int, ReservationReadDto> {
-
-    }
-
     override fun updateOrCancelReservation() {
         println("예약을 변경할 사용자 이름을 입력하세요")
         val name = readln().trim()
