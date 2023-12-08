@@ -10,7 +10,7 @@ import reservation.repository.ReservationRepository
 import reservation.service.ReservationServiceImpl
 import java.time.LocalDate
 
-class ReservationServiceTest : BehaviorSpec({
+class ReservationServiceAddTest : BehaviorSpec({
 //    beforeTest {
 //        reservationRepository = ReservationRepository()
 //        accountDetailRepository = AccountDetailRepository()
